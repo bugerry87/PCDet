@@ -133,7 +133,7 @@ WORKDIR /root
 
 # PCDet Framework
 ####################################################
-RUN git clone https://github.com/sshaoshuai/PCDet /root/PCDet
+RUN git clone https://github.com/bugerry87/PCDet /root/PCDet
 RUN cd /root/PCDet && python setup.py develop
 RUN echo "export LD_LIBRARY_PATH=/usr/local/lib/python3.6/dist-packages/spconv:$LD_LIBRARY_PATH" >> /root/.bashrc
 RUN mkdir /root/exchange
