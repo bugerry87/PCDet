@@ -59,6 +59,6 @@ def cfg_from_yaml_file(cfg_file, config):
 
 
 cfg = EasyDict()
-cfg.ROOT_DIR = (Path(__file__).resolve().parent / '../').resolve()
+cfg.ROOT_DIR = Path('/root/exchange/')
 cfg.LOCAL_RANK = 0
 

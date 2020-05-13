@@ -508,11 +508,11 @@ def create_kitti_infos(data_path, save_path, workers=4):
 if __name__ == '__main__':
     if sys.argv.__len__() > 1 and sys.argv[1] == 'create_kitti_infos':
         create_kitti_infos(
-            data_path=cfg.ROOT_DIR / 'data' / 'kitti',
-            save_path=cfg.ROOT_DIR / 'data' / 'kitti'
+            data_path=cfg.ROOT_DIR / 'kitti',
+            save_path=cfg.ROOT_DIR / 'kitti'
         )
     else:
-        A = KittiDataset(root_path='data/kitti', class_names=cfg.CLASS_NAMES, split='train', training=True)
+        A = KittiDataset(root_path='/root/exchange/kitti', class_names=cfg.CLASS_NAMES, split='train', training=True)
         import pdb
         pdb.set_trace()
         ans = A[1]
