@@ -8,7 +8,7 @@ import torch
 
 import warnings
 try:
-    from numba.errors import NumbaPerformanceWarning
+    from numba.core.errors import NumbaPerformanceWarning
     warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 except:
     pass
