@@ -1,13 +1,19 @@
+#Build In
 import os
 import sys
 import pickle
 import copy
+from glob import iglob
+
+# Installed
 import numpy as np
 from skimage import io
 from pathlib import Path
 import torch
 import spconv
+from argoverse.data_loading.argoverse_tracking_loader import ArgoverseTrackingLoader
 
+# Local
 from pcdet.utils import box_utils, object3d_utils, calibration, common_utils
 from pcdet.ops.roiaware_pool3d import roiaware_pool3d_utils
 from pcdet.config import cfg
@@ -15,23 +21,14 @@ from pcdet.datasets.data_augmentation.dbsampler import DataBaseSampler
 from pcdet.datasets import DatasetTemplate
 
 
-class BaseKittiDataset(DatasetTemplate):
-    def __init__(self, root_path, split='train'):
+class BaseArgoDataset(DatasetTemplate):
+    def __init__(self, root_path):
         super().__init__()
         self.root_path = root_path
-        self.root_split_path = os.path.join(self.root_path, 'training' if split != 'test' else 'testing')
-        self.split = split
+        self.atl = ArgoverseTrackingLoader(root_path)
 
-        if split in ['train', 'val', 'test']:
-            split_dir = os.path.join(self.root_path, 'ImageSets', split + '.txt')
-
-        self.sample_id_list = [x.strip() for x in open(split_dir).readlines()] if os.path.exists(split_dir) else None
-
-    def set_split(self, split):
-        self.__init__(self.root_path, split)
-
-    def get_lidar(self, idx):
-        lidar_file = os.path.join(self.root_split_path, 'velodyne', '%s.bin' % idx)
+    def gen_lidar(self, section='train'):
+        lidar_files = iglob('{}/train?/*/lidar/*'.format(self.root_path, section))
         assert os.path.exists(lidar_file)
         return np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 4)
 
@@ -339,7 +336,7 @@ class BaseKittiDataset(DatasetTemplate):
         return ap_result_str, ap_dict
 
 
-class KittiDataset(BaseKittiDataset):
+class ArgoDataset(BaseKittiDataset):
     def __init__(self, root_path, class_names, split, training, logger=None):
         """
         :param root_path: KITTI data path
@@ -508,11 +505,11 @@ def create_kitti_infos(data_path, save_path, workers=4):
 if __name__ == '__main__':
     if sys.argv.__len__() > 1 and sys.argv[1] == 'create_kitti_infos':
         create_kitti_infos(
-            data_path=cfg.ROOT_DIR / 'kitti',
-            save_path=cfg.ROOT_DIR / 'kitti'
+            data_path=cfg.ROOT_DIR / 'data' / 'kitti',
+            save_path=cfg.ROOT_DIR / 'data' / 'kitti'
         )
     else:
-        A = KittiDataset(root_path=cfg.ROOT_DIR / 'kitti', class_names=cfg.CLASS_NAMES, split='train', training=True)
+        A = KittiDataset(root_path='data/kitti', class_names=cfg.CLASS_NAMES, split='train', training=True)
         import pdb
         pdb.set_trace()
         ans = A[1]

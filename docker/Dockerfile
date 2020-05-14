@@ -131,9 +131,17 @@ ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPA
 
 WORKDIR /root
 
+# ==================================================================
 # PCDet Framework
-####################################################
+# ------------------------------------------------------------------
 RUN git clone https://github.com/bugerry87/PCDet /root/PCDet
 RUN cd /root/PCDet && python setup.py develop
 RUN echo "export LD_LIBRARY_PATH=/usr/local/lib/python3.6/dist-packages/spconv:$LD_LIBRARY_PATH" >> /root/.bashrc
 RUN mkdir /root/exchange
+
+# ==================================================================
+# Argoverse-API
+# ------------------------------------------------------------------
+RUN cd /root
+RUN git clone https://github.com/argoai/argoverse-api.git
+RUN pip3 install -e /root/argoverse-api
