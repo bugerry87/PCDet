@@ -21,11 +21,14 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
     DEBIAN_FRONTEND=noninteractive $APT_INSTALL \
         build-essential \
         ca-certificates \
+        libsm6 \
+        libxext6 \
+        libxrender-dev \
         cmake \
         wget \
         git \
         vim \
-	nano \
+	    nano \
         libx11-dev \
         fish \
         libsparsehash-dev \

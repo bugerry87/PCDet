@@ -193,8 +193,10 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='Generates a database of Parts')
     parser.add_argument('data_path', help='root path of the dataset')
-    parser.add_argument('save_path', help='path for saving the parts')
+    parser.add_argument('--save_path', default=None, help='path for saving the parts')
     parser.add_argument('--subsets', nargs='+', default=['train1','train2','train3','train4'], help='List of database subsets')
     args = parser.parse_args()
 
-    create_argo_infos(args.data_path, args.save_path, args.subsets)
+    if args.save_path is None:
+        args.save_path = args.data_path
+    create_argo_infos(Path(args.data_path), Path(args.save_path), args.subsets)
