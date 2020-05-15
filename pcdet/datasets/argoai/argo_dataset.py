@@ -71,7 +71,7 @@ class BaseArgoDataset(DatasetTemplate):
         if root is None:
             root = Path(self.root_path)
         for idx, subset, lidar, label, log in iter(self):
-            save_path = root / log.current_log / 'gt_parts'
+            save_path = root / subset / log.current_log / 'gt_parts'
             save_path.mkdir(parents=True, exist_ok=True)
 
             gt_boxes = np.zeros((len(label), 7))
