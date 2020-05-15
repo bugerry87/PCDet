@@ -55,9 +55,6 @@ class DatasetTemplate(torch_data.Dataset):
     def __len__(self):
         raise NotImplementedError
 
-    def forward(self, index):
-        raise NotImplementedError
-
     def prepare_data(self, input_dict, has_label=True):
         """
         :param input_dict:
