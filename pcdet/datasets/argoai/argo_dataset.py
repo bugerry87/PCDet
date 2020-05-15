@@ -21,13 +21,13 @@ from pcdet.datasets.data_augmentation.dbsampler import DataBaseSampler
 from pcdet.datasets import DatasetTemplate
 
 
-def shuffle_log(log:ArgoverseTrackingLoader):
+def shuffle_log(subset, log:ArgoverseTrackingLoader):
     index = np.arange(log.num_lidar_frame)
     random.shuffle(index)
     for idx in index:
         lidar = log.get_lidar(idx)
         label = log.get_label_object(idx)
-        yield idx, lidar, label, log
+        yield idx, subset, lidar, label, log
 
 
 class BaseArgoDataset(DatasetTemplate):
@@ -46,17 +46,17 @@ class BaseArgoDataset(DatasetTemplate):
         return self._len
 
     def __iter__(self):
-        for atl in self.atls.values():
+        for subset, atl in self.atls.items():
             for log in iter(atl):
                 for idx in range(atl.num_lidar_frame):
                     lidar = log.get_lidar(idx)
                     label = log.get_label_object(idx)
-                    yield idx, lidar, label, log
+                    yield idx, subset, lidar, label, log
         pass
 
     def shuffle(self, seed=0):
         random.seed = seed
-        generators = [(shuffle_log(log) for log in iter(atl)) for atl in self.atls.values()]
+        generators = [(shuffle_log(subset, log) for log in iter(atl)) for subset, atl in self.atls.items()]
         random.shuffle(generators)
         has_next = True
         while has_next:
@@ -70,11 +70,11 @@ class BaseArgoDataset(DatasetTemplate):
     def create_gt_parts(self, root=None):
         if root is None:
             root = Path(self.root_path)
-        for idx, lidar, label, log in iter(self):
+        for idx, subset, lidar, label, log in iter(self):
             save_path = root / log.current_log / 'gt_parts'
             save_path.mkdir(parents=True, exist_ok=True)
 
-            gt_boxes = np.zeros((len(label, 7)))
+            gt_boxes = np.zeros((len(label), 7))
             for i, obj in enumerate(label):
                 loc = obj.translation
                 quat = obj.quaternion
@@ -87,10 +87,11 @@ class BaseArgoDataset(DatasetTemplate):
             for i, obj in enumerate(label):
                 filename = save_path / '{}_{}_{}.bin'.format(idx, obj.label_class, obj.track_id)
                 gt_points = lidar[point_indices[i] > 0]
-                gt_points -= gt_points.mean(axis=0)
+                if len(gt_points) >= 10:
+                    gt_points -= gt_points.mean(axis=0)
 
-                with open(filename, 'wb') as f:
-                    gt_points.tofile(f)
+                    with open(filename, 'wb') as f:
+                        gt_points.tofile(f)
 
 
 class ArgoDataset(BaseArgoDataset):
